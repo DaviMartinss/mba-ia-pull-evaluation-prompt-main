@@ -291,7 +291,6 @@ def main():
     elif provider in ["google", "gemini"]:
         required_vars.append("GOOGLE_API_KEY")
 
-    print("a chave openai é ", os.getenv("OPENAI_API_KEY"))
     if not check_env_vars(required_vars):
         return 1
 
