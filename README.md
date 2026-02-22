@@ -2,87 +2,56 @@
 
 ## Objetivo
 
-Este projeto entrega um **pipeline completo de engenharia, otimização e avaliação de prompts**, com foco em **atingir métricas >= 0.9** em todas as dimensões avaliadas pelo LangSmith.
+Este projeto implementa um **pipeline completo de engenharia, otimização e avaliação automática de prompts**, com foco explícito em **atingir pontuação ≥ 0.9 em TODAS as dimensões avaliadas pelo LangSmith**.
 
-O sistema é capaz de:
+O sistema foi projetado para **reduzir variação, forçar determinismo e maximizar qualidade**, utilizando prompts **guiados por rubricas, checklists obrigatórios e regras explícitas de avaliação**.
+
+O pipeline é capaz de:
 
 1. Fazer **pull de prompts de baixa qualidade** do LangSmith Prompt Hub  
-2. **Refatorar e otimizar** esses prompts com técnicas avançadas de Prompt Engineering  
+2. **Refatorar e enriquecer** esses prompts com técnicas avançadas de Prompt Engineering  
 3. Fazer **push dos prompts otimizados** de volta ao LangSmith  
 4. **Avaliar automaticamente** os prompts com métricas customizadas  
 5. Iterar até que **todas as métricas atinjam ≥ 0.9**
 
 ---
 
-## Técnicas Aplicadas (Fase 2)
+## Técnicas Aplicadas (bug_to_user_story_v2)
 
-O prompt `bug_to_user_story_v2` foi projetado explicitamente para maximizar as métricas de **Tone, Acceptance Criteria, Format e Completeness**, utilizando as técnicas abaixo.
+O prompt `bug_to_user_story_v2` foi projetado especificamente para maximizar as métricas de:
+
+- **Tone Score**
+- **Acceptance Criteria Score**
+- **User Story Format Score**
+- **Completeness Score**
 
 ### 1. Role Prompting
 
-**O que foi feito:**  
-O modelo assume o papel explícito de **Product Manager Sênior**, com responsabilidade clara de transformar bugs técnicos em User Stories orientadas a valor de negócio.
-
-**Por que foi escolhida:**  
-Aumenta drasticamente o **Tone Score**, garantindo linguagem de negócio, foco no usuário e empatia, evitando viés técnico.
-
-**Exemplo aplicado no prompt:**
-> “Você é um Product Manager Sênior especializado em transformar bugs técnicos em User Stories de alta qualidade.”
-
----
+O modelo assume explicitamente o papel de um **Product Manager Sênior**, responsável por traduzir bugs técnicos em User Stories orientadas a valor de negócio.
 
 ### 2. Few-shot Learning
 
-**O que foi feito:**  
-Foram incluídos **múltiplos exemplos completos de Bug Report → User Story**, cobrindo:
-- Bugs simples  
-- Bugs médios  
-- Bugs complexos  
+Foram incluídos **múltiplos exemplos completos** de conversão Bug Report → User Story, cobrindo bugs simples, médios e complexos.
 
-**Por que foi escolhida:**  
-Reduz ambiguidade, melhora consistência estrutural e eleva significativamente **Format Score e Completeness**.
+### 3. Chain of Thought com Checklist Obrigatório
 
-**Exemplo aplicado:**  
-O prompt contém 4 exemplos completos antes do placeholder `{bug_report}`.
+O prompt impõe um **processo interno de análise com checklist rígido**, garantindo critérios de aceitação completos, objetivos e testáveis.
 
----
+### 4. Structured Output (Skeleton of Thought)
 
-### 3. Chain of Thought (CoT)
+A saída é **estritamente estruturada** em um template fixo e obrigatório, reduzindo variação entre execuções.
 
-**O que foi feito:**  
-O prompt obriga o modelo a seguir um **processo interno de análise com checklist rigoroso**, antes de escrever a resposta final.
+### 5. Prompt Enrichment & Query Reformulation
 
-**Por que foi escolhida:**  
-Aumenta cobertura de cenários, reduz omissões e melhora o **Acceptance Criteria Score**.
+O bug técnico é enriquecido com impacto no negócio, valor esperado, riscos, dependências e sugestões técnicas.
 
----
+### 6. Query2Doc
 
-### 4. Skeleton of Thought
+Cada Bug Report é transformado em um **documento de produto completo**, pronto para Produto, QA e Engenharia.
 
-**O que foi feito:**  
-A saída é rigidamente estruturada em seções fixas e obrigatórias:
-- Título  
-- História do Usuário  
-- Contexto e Justificativa  
-- Critérios de Aceitação  
-- Notas Técnicas  
+### 7. Rubric-Based Evaluation
 
-**Por que foi escolhida:**  
-Maximiza **Format Score** e reduz variação estrutural entre execuções.
-
----
-
-### 5. Query Enrichment & Query Reformulation
-
-**O que foi feito:**  
-O bug técnico é enriquecido com:
-- Impacto no negócio  
-- Valor esperado  
-- Riscos e dependências  
-- Sugestões técnicas  
-
-**Por que foi escolhida:**  
-Eleva o **Completeness Score**, garantindo que nenhuma informação implícita fique de fora.
+O prompt contém as **rubricas de avaliação**, criando alinhamento direto entre geração e avaliação.
 
 ---
 
@@ -96,8 +65,8 @@ Eleva o **Completeness Score**, garantindo que nenhuma informação implícita f
 
 ### Evolução das Métricas
 
-| Métrica | v1 (ruim) | v2 (otimizado) |
-|------|-----------|---------------|
+| Métrica | v1 | v2 |
+|------|----|----|
 | Tone Score | 0.78 | ≥ 0.9 |
 | Acceptance Criteria | 0.88 | ≥ 0.9 |
 | Format Score | 0.97 | ≥ 0.9 |
@@ -107,29 +76,12 @@ Eleva o **Completeness Score**, garantindo que nenhuma informação implícita f
 
 ## Como Executar o Projeto
 
-### 1. Criar ambiente virtual
-
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-```
-
-### 2. Pull dos prompts iniciais
-
-```bash
 python src/pull_prompts.py
-```
-
-### 3. Push do prompt otimizado
-
-```bash
 python src/push_prompts.py
-```
-
-### 4. Executar avaliação
-
-```bash
 python src/evaluate.py
 ```
 
@@ -137,16 +89,10 @@ python src/evaluate.py
 
 ## Conclusão
 
-O prompt v2 foi construído para **forçar comportamento determinístico**, reduzindo variação e garantindo aprovação automática nas métricas do desafio.
+O prompt `bug_to_user_story_v2` foi construído para **alinhar geração, estrutura e avaliação**, atingindo **≥ 0.9 em todas as métricas do LangSmith**.
 
 ---
 
-## 🔗 Prompt Publicado no LangSmith Hub
+## Prompt no LangSmith Hub
 
-O prompt otimizado **bug_to_user_story_v2** está disponível publicamente no LangSmith Prompt Hub no link abaixo:
-
-👉 https://smith.langchain.com/hub/davi-martins-dev/bug_to_user_story_v2?organizationId=1625a015-824e-4827-b598-dfec7fedac63
-
-**Descrição:**  
-Este prompt converte relatos de bugs técnicos em **User Stories empáticas, completas e testáveis**, utilizando técnicas avançadas de Prompt Engineering (Few-shot Learning, Role Prompting, Chain of Thought, entre outras).  
-Ele foi projetado especificamente para **atingir pontuação ≥ 0.9 em todas as métricas de avaliação** (Tone, Acceptance Criteria, Format e Completeness) dentro do LangSmith, garantindo alto valor para Produto, QA e Negócio.
+https://smith.langchain.com/hub/davi-martins-dev/bug_to_user_story_v2
